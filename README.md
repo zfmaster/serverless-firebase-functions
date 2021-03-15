@@ -98,6 +98,14 @@ functions:
     events:
       - pubsub: 
           topic: myPubSubMessageTopic
+  myRtdbEventFunction:
+    handler: handlers/myHandlerFile.myFunctionName
+    environment:
+        functionEnvVar: someValue
+    events:
+      - database: 
+          ref: dbPath/{dbParam} 
+          onEvent: onUpdate # Check https://firebase.google.com/docs/functions/database-events#set_the_event_handler
 ```
 
 ## Deployment

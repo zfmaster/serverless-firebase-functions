@@ -66,6 +66,11 @@ module.exports = {
                                 functionTemplateType = 'pubsub';
                                 templateVariables['topic'] = event.pubsub.topic
                                 break;
+                            case 'database':
+                                functionTemplateType = 'database';
+                                templateVariables['ref'] = event.database.ref
+                                templateVariables['onEvent'] = event.database.onEvent
+                                break;
                         }
                     })
                 })
