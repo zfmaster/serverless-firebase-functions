@@ -5,7 +5,7 @@ const firebaseClient = require('firebase-tools');
 const firebaseApi = require('firebase-tools/lib/api');
 const firebaseAuth = require('firebase-tools/lib/auth');
 const BbPromise = require('bluebird');
-const transports = require('winston/lib/winston/transports');
+const winston = require('winston');
 const merge = require("lodash.merge");
 var logger = require("firebase-tools/lib/logger");
 
@@ -49,13 +49,15 @@ module.exports = {
         const firebasePath = path.join('.serverless', 'firebase', 'functions');
         const allFunctions = this.readyFunctionsForDeploy;
         firebaseApi.setAccessToken(this.token);
-        logger.add(transports.Console);
+        logger.add(new winston.transports.Console({
+            level: 'info'
+        }));
 
         var globalEnvVariables = {};
         if (typeof this.serverless.service.provider['environment'] === 'object') {
             globalEnvVariables = this.serverless.service.provider['environment'];
         }
-        
+
         var functionsConfig = [];
         for (const functionName of allFunctions) {
             var functionObject = this.serverless.service.getFunction(functionName);
@@ -63,7 +65,7 @@ module.exports = {
             if (typeof functionObject['environment'] === 'object') {
                 merge(functionEnvVariables, functionObject['environment']);
             }
-            
+
             functionsConfig.push(`serverless.${functionName.toLowerCase()}="${new Buffer(JSON.stringify(functionEnvVariables)).toString("base64")}"`);
         }
 
