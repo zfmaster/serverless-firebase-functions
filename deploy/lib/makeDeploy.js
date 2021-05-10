@@ -8,6 +8,8 @@ const BbPromise = require('bluebird');
 const winston = require('winston');
 const merge = require("lodash.merge");
 var logger = require("firebase-tools/lib/logger");
+const { SPLAT } = require("triple-beam");
+const utils = require("firebase-tools/lib/utils");
 
 module.exports = {
     token: '',
@@ -50,9 +52,15 @@ module.exports = {
         const allFunctions = this.readyFunctionsForDeploy;
         firebaseApi.setAccessToken(this.token);
         logger.add(new winston.transports.Console({
-            level: 'info'
+            level: 'info',
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.printf((info) => {
+                    const segments = [info.message, ...(info[SPLAT] || [])].map(utils.tryStringify);
+                    return `[${info.level}] ${segments.join(" ")}`;
+                })
+            )
         }));
-
         var globalEnvVariables = {};
         if (typeof this.serverless.service.provider['environment'] === 'object') {
             globalEnvVariables = this.serverless.service.provider['environment'];
